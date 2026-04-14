@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ResQ+ | Resilience Intelligence System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --red: #E63329;
+  --red-deep: #B5241B;
+  --amber: #F4A347;
+  --white: #F7F5F2;
+  --dark: #111010;
+  --mid: #1A1818;
+  --card: #201E1E;
+  --muted: #7A716A;
+  --border: rgba(255,255,255,0.07);
+}
+
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior: smooth; }
+body { background:var(--dark); color:var(--white); font-family:'DM Sans',sans-serif; font-weight:300; overflow-x:hidden; }
+
+/* NAV */
+nav {
+  position:fixed; top:0; left:0; right:0; z-index:100;
+  display:flex; align-items:center; justify-content:space-between;
+  padding:20px 48px;
+  transition:background 0.4s, backdrop-filter 0.4s, border-color 0.4s;
+  border-bottom:1px solid transparent;
+}
+nav.scrolled { background:rgba(17,16,16,0.88); backdrop-filter:blur(20px); border-color:var(--border); }
+.nav-logo { display:flex; align-items:center; gap:10px; text-decoration:none; }
+.logo-mark { width:34px; height:34px; background:var(--red); border-radius:8px; display:flex; align-items:center; justify-content:center; font-family:'Syne',sans-serif; font-weight:800; font-size:13px; color:white; }
+.logo-text { font-family:'Syne',sans-serif; font-weight:700; font-size:17px; color:var(--white); }
+.logo-text em { color:var(--amber); font-style:normal; }
+.nav-links { display:flex; gap:32px; list-style:none; align-items:center; }
+.nav-links a { color:var(--muted); text-decoration:none; font-size:14px; transition:color 0.2s; }
+.nav-links a:hover { color:var(--white); }
+.nav-cta { background:var(--red) !important; color:white !important; padding:8px 20px; border-radius:100px; font-weight:500 !important; transition:background 0.2s !important; }
+.nav-cta:hover { background:var(--red-deep) !important; }
+
+/* HERO */
+#hero {
+  min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center;
+  text-align:center; padding:120px 24px 80px; position:relative; overflow:hidden;
+}
+.hero-bg {
+  position:absolute; inset:0; z-index:0;
+  background: radial-gradient(ellipse 70% 55% at 50% 55%, rgba(230,51,41,0.1) 0%, transparent 65%), linear-gradient(180deg,#111010 0%,#140a0a 100%);
+}
+.hero-grid {
+  position:absolute; inset:0; z-index:0;
+  background-image: linear-gradient(var(--border) 1px,transparent 1px), linear-gradient(90deg,var(--border) 1px,transparent 1px);
+  background-size:64px 64px;
+  mask-image:radial-gradient(ellipse 80% 70% at 50% 50%,black 20%,transparent 75%);
+}
+.hero-orb {
+  position:absolute; z-index:0; width:500px; height:500px;
+  background:radial-gradient(circle,rgba(230,51,41,0.08) 0%,transparent 70%);
+  top:50%; left:50%; transform:translate(-50%,-50%);
+  animation:orbPulse 5s ease-in-out infinite;
+}
+@keyframes orbPulse { 0%,100%{transform:translate(-50%,-50%) scale(1);opacity:.7} 50%{transform:translate(-50%,-50%) scale(1.15);opacity:1} }
+
+.hero-badge {
+  position:relative; z-index:1; display:inline-flex; align-items:center; gap:8px;
+  background:rgba(230,51,41,0.08); border:1px solid rgba(230,51,41,0.25);
+  border-radius:100px; padding:6px 18px; font-size:11px; letter-spacing:1.8px;
+  text-transform:uppercase; color:var(--red); margin-bottom:32px;
+  opacity:0; animation:fadeUp 0.7s 0.15s forwards;
+}
+.badge-dot { width:6px; height:6px; background:var(--red); border-radius:50%; animation:blink 1.8s infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+.hero-title {
+  position:relative; z-index:1; font-family:'Syne',sans-serif;
+  font-size:clamp(72px,12vw,130px); font-weight:800; line-height:.88; letter-spacing:-5px;
+  color:var(--white); margin-bottom:6px; opacity:0; animation:fadeUp 0.8s 0.3s forwards;
+}
+.plus { color:var(--amber); display:inline-block; animation:floatY 3.5s ease-in-out infinite; }
+@keyframes floatY { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+
+.hero-sub {
+  position:relative; z-index:1; font-size:12px; letter-spacing:4px;
+  text-transform:uppercase; color:var(--muted); margin-bottom:28px;
+  opacity:0; animation:fadeUp 0.8s 0.45s forwards;
+}
+.hero-desc {
+  position:relative; z-index:1; max-width:500px; font-size:17px; line-height:1.72;
+  color:var(--muted); margin-bottom:48px; opacity:0; animation:fadeUp 0.8s 0.6s forwards;
+}
+.hero-desc strong { color:var(--white); font-weight:400; }
+.hero-btns {
+  position:relative; z-index:1; display:flex; gap:14px; flex-wrap:wrap; justify-content:center;
+  opacity:0; animation:fadeUp 0.8s 0.75s forwards;
+}
+.btn-red { background:var(--red); color:white; padding:14px 34px; border-radius:100px; font-size:15px; font-weight:500; text-decoration:none; font-family:'DM Sans',sans-serif; transition:background 0.2s,transform 0.2s,box-shadow 0.2s; }
+.btn-red:hover { background:var(--red-deep); transform:translateY(-2px); box-shadow:0 16px 36px rgba(230,51,41,0.28); }
+.btn-ghost { background:transparent; color:var(--white); padding:14px 34px; border-radius:100px; font-size:15px; text-decoration:none; font-family:'DM Sans',sans-serif; border:1px solid rgba(255,255,255,0.18); transition:border-color 0.2s,background 0.2s; }
+.btn-ghost:hover { border-color:rgba(255,255,255,0.4); background:rgba(255,255,255,0.04); }
+
+.scroll-cue {
+  position:absolute; bottom:36px; left:50%; transform:translateX(-50%);
+  z-index:1; display:flex; flex-direction:column; align-items:center; gap:8px;
+  opacity:0; animation:fadeUp 0.8s 1.1s forwards;
+}
+.scroll-cue span { font-size:10px; letter-spacing:2.5px; text-transform:uppercase; color:var(--muted); }
+.scroll-line { width:1px; height:36px; background:linear-gradient(to bottom,rgba(255,255,255,0.25),transparent); animation:scrollAnim 2s ease-in-out infinite; }
+@keyframes scrollAnim { 0%{transform:scaleY(0);transform-origin:top} 50%{transform:scaleY(1);transform-origin:top} 51%{transform:scaleY(1);transform-origin:bottom} 100%{transform:scaleY(0);transform-origin:bottom} }
+@keyframes fadeUp { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:translateY(0)} }
+
+/* STATS */
+.stats-strip { display:grid; grid-template-columns:repeat(4,1fr); border-top:1px solid var(--border); border-bottom:1px solid var(--border); }
+.stat-item { padding:48px 24px; text-align:center; border-right:1px solid var(--border); opacity:0; transform:translateY(16px); transition:opacity 0.5s ease,transform 0.5s ease; }
+.stat-item:last-child { border-right:none; }
+.stat-item.vis { opacity:1; transform:translateY(0); }
+.stat-num { font-family:'Syne',sans-serif; font-size:clamp(38px,5vw,58px); font-weight:800; letter-spacing:-2px; line-height:1; color:var(--white); }
+.stat-num .u { color:var(--red); }
+.stat-lbl { font-size:13px; color:var(--muted); margin-top:8px; line-height:1.4; }
+
+/* SHARED */
+.section { padding:100px 48px; }
+.lbl { font-size:11px; letter-spacing:3px; text-transform:uppercase; color:var(--red); margin-bottom:16px; }
+.h2 { font-family:'Syne',sans-serif; font-size:clamp(34px,5vw,58px); font-weight:700; letter-spacing:-2px; line-height:1.05; color:var(--white); margin-bottom:20px; }
+.body-txt { font-size:16px; line-height:1.75; color:var(--muted); max-width:500px; }
+.reveal { opacity:0; transform:translateY(24px); transition:opacity 0.65s ease,transform 0.65s ease; }
+.reveal.vis { opacity:1; transform:translateY(0); }
+
+/* PROBLEM */
+#problem { display:grid; grid-template-columns:1fr 1fr; gap:72px; align-items:center; }
+.phone-wrap { position:relative; display:flex; justify-content:center; padding:40px 0; }
+.phone-glow { position:absolute; width:280px; height:280px; background:radial-gradient(circle,rgba(230,51,41,0.13) 0%,transparent 70%); top:50%; left:50%; transform:translate(-50%,-50%); animation:orbPulse 4s ease-in-out infinite; }
+.phone { width:210px; background:var(--card); border-radius:36px; border:1.5px solid rgba(255,255,255,0.09); overflow:hidden; padding:20px 16px 24px; box-shadow:0 48px 96px rgba(0,0,0,0.55); display:flex; flex-direction:column; gap:10px; position:relative; z-index:1; }
+.phone-notch { width:72px; height:18px; background:var(--dark); border-radius:100px; margin:0 auto 8px; }
+.p-alert { background:rgba(230,51,41,0.12); border:1px solid rgba(230,51,41,0.3); border-radius:14px; padding:12px; animation:alertGlow 2.5s ease-in-out infinite; }
+@keyframes alertGlow { 0%,100%{box-shadow:0 0 0 0 rgba(230,51,41,0.25)} 50%{box-shadow:0 0 0 6px rgba(230,51,41,0)} }
+.p-alert-t { font-size:10px; font-weight:600; color:var(--red); letter-spacing:1px; text-transform:uppercase; }
+.p-alert-b { font-size:12px; color:var(--white); margin-top:4px; line-height:1.4; }
+.p-card { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.07); border-radius:12px; padding:12px; }
+.p-card-lbl { font-size:9px; color:var(--muted); letter-spacing:1.2px; text-transform:uppercase; }
+.p-card-val { font-family:'Syne',sans-serif; font-size:20px; font-weight:700; color:var(--white); margin-top:2px; }
+.p-card-val.green { color:#4ade80; }
+.p-tag { display:inline-flex; align-items:center; gap:5px; background:rgba(74,222,128,0.08); border:1px solid rgba(74,222,128,0.25); border-radius:100px; padding:5px 12px; font-size:11px; color:#4ade80; }
+
+/* FEATURES */
+#features { background:var(--mid); border-radius:28px; margin:0 24px; padding:80px 64px; }
+.feat-header { display:flex; justify-content:space-between; align-items:flex-end; gap:24px; margin-bottom:56px; flex-wrap:wrap; }
+.feat-header p { max-width:260px; font-size:14px; color:var(--muted); line-height:1.7; }
+.feat-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:2px; background:rgba(255,255,255,0.05); border-radius:18px; overflow:hidden; }
+.feat-card { background:var(--mid); padding:36px 28px; transition:background 0.25s; position:relative; overflow:hidden; }
+.feat-card::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:var(--red); transform:scaleX(0); transform-origin:left; transition:transform 0.35s ease; }
+.feat-card:hover::before { transform:scaleX(1); }
+.feat-card:hover { background:#252222; }
+.feat-icon { font-size:28px; margin-bottom:16px; display:block; }
+.feat-title { font-family:'Syne',sans-serif; font-size:16px; font-weight:700; color:var(--white); margin-bottom:10px; }
+.feat-desc { font-size:13px; color:var(--muted); line-height:1.65; }
+
+/* HOW */
+#how { display:grid; grid-template-columns:1fr 1fr; gap:72px; align-items:start; }
+.steps { display:flex; flex-direction:column; margin-top:40px; }
+.step { display:flex; gap:20px; padding:24px 0; border-bottom:1px solid var(--border); opacity:0; transform:translateX(-16px); transition:opacity 0.5s ease,transform 0.5s ease; }
+.step.vis { opacity:1; transform:translateX(0); }
+.step-n { font-family:'Syne',sans-serif; font-size:12px; font-weight:700; color:var(--red); min-width:24px; padding-top:3px; }
+.step-title { font-family:'Syne',sans-serif; font-size:16px; font-weight:600; color:var(--white); margin-bottom:5px; }
+.step-desc { font-size:13px; color:var(--muted); line-height:1.6; }
+.how-cards { display:flex; flex-direction:column; gap:14px; padding-top:72px; }
+.how-card { background:var(--card); border:1px solid var(--border); border-radius:18px; padding:28px; }
+.how-card-lbl { font-size:10px; color:var(--muted); letter-spacing:1.5px; text-transform:uppercase; margin-bottom:10px; }
+.how-card-val { font-family:'Syne',sans-serif; font-size:40px; font-weight:800; letter-spacing:-2px; }
+.how-card-val.red { color:var(--red); }
+.how-card-val.green { color:#4ade80; font-size:22px; letter-spacing:-0.5px; margin-top:6px; }
+.how-card-sub { font-size:12px; color:var(--muted); margin-top:5px; }
+
+/* IMPACT */
+#impact { text-align:center; position:relative; overflow:hidden; }
+.impact-bg { position:absolute; inset:0; background:radial-gradient(ellipse 55% 45% at 50% 50%,rgba(230,51,41,0.06) 0%,transparent 70%); }
+.impact-head { position:relative; z-index:1; margin-bottom:56px; }
+.impact-head .h2 { margin:0 auto 16px; }
+.impact-head .body-txt { margin:0 auto; }
+.impact-grid { display:grid; grid-template-columns:repeat(2,1fr); max-width:660px; margin:0 auto; gap:2px; background:rgba(255,255,255,0.05); border-radius:22px; overflow:hidden; position:relative; z-index:1; }
+.impact-item { background:var(--dark); padding:36px; text-align:left; transition:background 0.25s; }
+.impact-item:hover { background:var(--card); }
+.impact-icon { font-size:22px; margin-bottom:14px; }
+.impact-num { font-family:'Syne',sans-serif; font-size:28px; font-weight:800; color:var(--red); letter-spacing:-1px; display:block; margin-bottom:4px; }
+.impact-txt { font-size:14px; color:var(--muted); line-height:1.5; }
+
+/* PARTNERS */
+#partners { padding:72px 48px; border-top:1px solid var(--border); text-align:center; }
+.partner-lbl { font-size:11px; letter-spacing:3px; text-transform:uppercase; color:var(--muted); margin-bottom:36px; }
+.partner-row { display:flex; align-items:center; justify-content:center; gap:56px; flex-wrap:wrap; }
+.partner-name { font-family:'Syne',sans-serif; font-size:18px; font-weight:700; color:rgba(255,255,255,0.18); letter-spacing:-0.5px; transition:color 0.3s; }
+.partner-name:hover { color:rgba(255,255,255,0.45); }
+.partner-x { font-size:22px; color:rgba(255,255,255,0.1); }
+
+/* CTA */
+#cta { margin:0 24px 72px; background:var(--red); border-radius:28px; padding:88px 64px; text-align:center; position:relative; overflow:hidden; }
+#cta::before { content:''; position:absolute; top:-80px; right:-80px; width:320px; height:320px; background:rgba(255,255,255,0.05); border-radius:50%; }
+#cta::after { content:''; position:absolute; bottom:-60px; left:-40px; width:200px; height:200px; background:rgba(0,0,0,0.08); border-radius:50%; }
+.cta-title { font-family:'Syne',sans-serif; font-size:clamp(36px,6vw,68px); font-weight:800; color:white; letter-spacing:-3px; line-height:1; margin-bottom:18px; position:relative; z-index:1; }
+.cta-sub { font-size:17px; color:rgba(255,255,255,0.72); max-width:440px; margin:0 auto 36px; line-height:1.65; position:relative; z-index:1; }
+.btn-white { background:white; color:var(--red); padding:14px 36px; border-radius:100px; font-size:15px; font-weight:600; text-decoration:none; display:inline-flex; align-items:center; gap:10px; font-family:'DM Sans',sans-serif; position:relative; z-index:1; transition:transform 0.2s,box-shadow 0.2s; }
+.btn-white:hover { transform:translateY(-2px); box-shadow:0 16px 36px rgba(0,0,0,0.2); }
+
+/* FOOTER */
+footer { padding:40px 48px; border-top:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:20px; }
+.footer-logo { display:flex; align-items:center; gap:10px; margin-bottom:10px; }
+.footer-txt { font-size:12px; color:var(--muted); }
+.footer-ig { display:inline-flex; align-items:center; gap:6px; margin-top:8px; font-size:12px; color:var(--muted); text-decoration:none; transition:color 0.2s; }
+.footer-ig:hover { color:var(--white); }
+.footer-links { display:flex; gap:28px; flex-wrap:wrap; }
+.footer-links a { font-size:13px; color:var(--muted); text-decoration:none; transition:color 0.2s; }
+.footer-links a:hover { color:var(--white); }
+
+/* LANG */
+.lang-btn { position:fixed; bottom:28px; right:28px; z-index:200; background:var(--card); border:1px solid rgba(255,255,255,0.1); border-radius:100px; padding:9px 18px; font-size:13px; color:var(--white); cursor:pointer; font-family:'DM Sans',sans-serif; transition:background 0.2s; letter-spacing:0.3px; }
+.lang-btn:hover { background:rgba(255,255,255,0.08); }
+
+/* RESPONSIVE */
+@media(max-width:768px){
+  nav { padding:18px 24px; }
+  .nav-links { display:none; }
+  .stats-strip { grid-template-columns:repeat(2,1fr); }
+  .section { padding:72px 24px; }
+  #problem { grid-template-columns:1fr; }
+  #features { margin:0; padding:60px 24px; border-radius:0; }
+  .feat-grid { grid-template-columns:1fr; }
+  #how { grid-template-columns:1fr; }
+  .how-cards { padding-top:0; }
+  .impact-grid { grid-template-columns:1fr; }
+  #cta { margin:0 0 48px; border-radius:0; padding:60px 24px; }
+  footer { flex-direction:column; text-align:center; padding:32px 24px; }
+  .footer-logo { justify-content:center; }
+  .footer-links { justify-content:center; }
+}
+</style>
+</head>
+<body>
+
+<nav id="nav">
+  <a href="#" class="nav-logo">
+    <div class="logo-mark">R+</div>
+    <span class="logo-text">ResQ<em>+</em></span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#problem">Problem</a></li>
+    <li><a href="#features">Features</a></li>
+    <li><a href="#how">How It Works</a></li>
+    <li><a href="#impact">Impact</a></li>
+    <li><a href="#cta" class="nav-cta">Get Involved</a></li>
+    <li><a href="https://www.instagram.com/resqapp" target="_blank" style="display:inline-flex;align-items:center;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1.5" fill="currentColor" stroke="none"/></svg></a></li>
+  </ul>
+</nav>
+
+<section id="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-orb"></div>
+  <div class="hero-badge"><span class="badge-dot"></span>Ford Community Resiliency Challenge 2026</div>
+  <h1 class="hero-title">ResQ<span class="plus">+</span></h1>
+  <p class="hero-sub" id="heroSub">Resilience Intelligence System</p>
+  <p class="hero-desc" id="heroDesc">When disaster strikes, every second matters.<br><strong>ResQ+ is the AI-powered emergency platform</strong> that guides communities through any crisis — even without internet.</p>
+  <div class="hero-btns">
+    <a href="#features" class="btn-red">Explore the System</a>
+    <a href="#how" class="btn-ghost">How it works</a>
+  </div>
+  <div class="scroll-cue"><span>Scroll</span><div class="scroll-line"></div></div>
+</section>
+
+<div class="stats-strip">
+  <div class="stat-item"><div class="stat-num"><span class="counter" data-target="72">0</span><span class="u">%</span></div><div class="stat-lbl">of MX communities lack real emergency plans</div></div>
+  <div class="stat-item"><div class="stat-num"><span class="counter" data-target="4">0</span><span class="u">min</span></div><div class="stat-lbl">avg response time improvement projected</div></div>
+  <div class="stat-item"><div class="stat-num"><span class="counter" data-target="100">0</span><span class="u">%</span></div><div class="stat-lbl">offline functionality via mesh network</div></div>
+  <div class="stat-item"><div class="stat-num"><span class="counter" data-target="6">0</span><span class="u">+</span></div><div class="stat-lbl">disaster types covered by AI guidance</div></div>
+</div>
+
+<section id="problem" class="section">
+  <div>
+    <p class="lbl reveal">The Problem</p>
+    <h2 class="h2 reveal">Communities face disasters without the right tools.</h2>
+    <p class="body-txt reveal">In Mexico, natural disasters displace thousands yearly. Existing alert systems send generic notifications — but don't tell people <em>what to do</em>, <em>where to go</em>, or how to stay connected when networks fail.</p>
+    <br>
+    <p class="body-txt reveal" style="font-size:15px;">The gap between an alert and survival is <strong style="color:var(--white);font-weight:400">actionable, real-time, adaptive guidance.</strong> That's exactly what ResQ+ delivers.</p>
+  </div>
+  <div class="phone-wrap reveal">
+    <div class="phone-glow"></div>
+    <div class="phone">
+      <div class="phone-notch"></div>
+      <div class="p-alert"><div class="p-alert-t">⚠ Seismic Alert — M6.2</div><div class="p-alert-b">DROP. Cover neck & head. Hold until shaking stops. Flashlight activated.</div></div>
+      <div class="p-card"><div class="p-card-lbl">Nearest safe zone</div><div class="p-card-val">340m →</div></div>
+      <div class="p-card"><div class="p-card-lbl">Route status</div><div class="p-card-val green">Clear ✓</div></div>
+      <div class="p-tag">📡 Mesh Mode Active</div>
+    </div>
+  </div>
+</section>
+
+<section id="features">
+  <div class="feat-header">
+    <div><p class="lbl">What We Built</p><h2 class="h2" style="max-width:400px;">Not just an app — a survival ecosystem.</h2></div>
+    <p>Every feature was designed around one question: what do people actually need in the worst moment of their lives?</p>
+  </div>
+  <div class="feat-grid">
+    <div class="feat-card"><span class="feat-icon">🧠</span><div class="feat-title">AI Disaster Detection</div><div class="feat-desc">Identifies the emergency type via geolocation and sensor data, delivering specific step-by-step guidance for earthquakes, floods, fires, and more.</div></div>
+    <div class="feat-card"><span class="feat-icon">🗺️</span><div class="feat-title">Dynamic Evacuation Routes</div><div class="feat-desc">Real-time routing that adapts as users report blocked roads. No static maps — the path evolves with what's happening on the ground.</div></div>
+    <div class="feat-card"><span class="feat-icon">📡</span><div class="feat-title">Offline Mesh Network</div><div class="feat-desc">When cell towers go dark, ResQ+ switches to Bluetooth mesh — keeping communities connected without any internet access.</div></div>
+    <div class="feat-card"><span class="feat-icon">🎙️</span><div class="feat-title">Voice Activation</div><div class="feat-desc">Trigger emergency protocols hands-free. Say "HELP," "FIRE," or "QUAKE" and the app auto-activates GPS, calls, and audio recording.</div></div>
+    <div class="feat-card"><span class="feat-icon">🫀</span><div class="feat-title">Immobility Detection</div><div class="feat-desc">If no movement is detected, ResQ+ assumes the user may be trapped — auto-broadcasting their location with a distress sound signal.</div></div>
+    <div class="feat-card"><span class="feat-icon">📊</span><div class="feat-title">Government Dashboard</div><div class="feat-desc">Real-time aggregated data for emergency coordinators — hazard maps, active SOS signals, and road status for faster decisions.</div></div>
+  </div>
+</section>
+
+<section id="how" class="section">
+  <div>
+    <p class="lbl reveal">Process</p>
+    <h2 class="h2 reveal">From alert to safety in four steps.</h2>
+    <p class="body-txt reveal">ResQ+ closes the loop between detection, communication, action, and community recovery.</p>
+    <div class="steps">
+      <div class="step"><span class="step-n">01</span><div><div class="step-title">Detect & Classify</div><div class="step-desc">AI analyzes incoming signals and classifies the disaster type instantly, triggering the right protocol for that specific emergency.</div></div></div>
+      <div class="step"><span class="step-n">02</span><div><div class="step-title">Alert & Guide</div><div class="step-desc">Users receive clear, actionable instructions — not vague alerts. Voice, visual, and haptic guidance activates simultaneously.</div></div></div>
+      <div class="step"><span class="step-n">03</span><div><div class="step-title">Connect & Navigate</div><div class="step-desc">Mesh network activates. Community members share live hazard reports. Dynamic routes update in real time.</div></div></div>
+      <div class="step"><span class="step-n">04</span><div><div class="step-title">Recover & Learn</div><div class="step-desc">Incident data feeds the government dashboard and improves AI models. Communities grow more prepared with every event.</div></div></div>
+    </div>
+  </div>
+  <div class="how-cards">
+    <div class="how-card reveal"><div class="how-card-lbl">Active SOS signals</div><div class="how-card-val red">12</div><div class="how-card-sub">being monitored right now</div></div>
+    <div class="how-card reveal"><div class="how-card-lbl">Community hazard reports</div><div class="how-card-val">47</div><div class="how-card-sub">from active users this session</div></div>
+    <div class="how-card reveal"><div class="how-card-lbl">Network mode</div><div class="how-card-val green">Mesh Active</div><div class="how-card-sub">8 nodes connected — no internet needed</div></div>
+  </div>
+</section>
+
+<section id="impact" class="section">
+  <div class="impact-bg"></div>
+  <div class="impact-head reveal">
+    <p class="lbl">Why It Matters</p>
+    <h2 class="h2">Measurable impact on real communities.</h2>
+    <p class="body-txt">We track real indicators of community resilience — not vanity metrics.</p>
+  </div>
+  <div class="impact-grid">
+    <div class="impact-item"><div class="impact-icon">📱</div><span class="impact-num">500+</span><span class="impact-txt">App users registered in pilot phase</span></div>
+    <div class="impact-item"><div class="impact-icon">🏫</div><span class="impact-num">10+</span><span class="impact-txt">Schools trained in disaster simulations</span></div>
+    <div class="impact-item"><div class="impact-icon">⚡</div><span class="impact-num">4 min</span><span class="impact-txt">Reduction in simulated response time</span></div>
+    <div class="impact-item"><div class="impact-icon">🤝</div><span class="impact-num">3+</span><span class="impact-txt">Community organizations engaged as partners</span></div>
+  </div>
+</section>
+
+<section id="partners">
+  <div class="partner-lbl">Developed in collaboration with</div>
+  <div class="partner-row">
+    <div class="partner-name">Ford Philanthropy</div>
+    <div class="partner-x">×</div>
+    <div class="partner-name">Enactus</div>
+    <div class="partner-x">×</div>
+    <div class="partner-name">TecMilenio</div>
+  </div>
+</section>
+
+<section id="cta">
+  <h2 class="cta-title">Ready when disaster isn't.</h2>
+  <p class="cta-sub">ResQ+ is built by students who believe technology should protect the people who need it most.</p>
+  <a href="https://www.instagram.com/resqapp" target="_blank" class="btn-white">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1.5" fill="currentColor" stroke="none"/></svg>
+    Follow us @resqapp
+  </a>
+</section>
+
+<footer>
+  <div>
+    <div class="footer-logo">
+      <div class="logo-mark" style="width:28px;height:28px;font-size:12px;">R+</div>
+      <span class="logo-text" style="font-size:15px;">ResQ<em>+</em></span>
+    </div>
+    <p class="footer-txt">Resilience Intelligence System — Universidad TecMilenio, México</p>
+    <a href="https://www.instagram.com/resqapp" target="_blank" class="footer-ig">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1.5" fill="currentColor" stroke="none"/></svg>
+      @resqapp
+    </a>
+  </div>
+  <div class="footer-links">
+    <a href="#problem">Problem</a>
+    <a href="#features">Features</a>
+    <a href="#impact">Impact</a>
+    <a href="https://www.instagram.com/resqapp" target="_blank">Instagram</a>
+  </div>
+</footer>
+
+<button class="lang-btn" id="langBtn" onclick="toggleLang()">🌐 ES</button>
+
+<script>
+// NAV
+window.addEventListener('scroll', () => {
+  document.getElementById('nav').classList.toggle('scrolled', window.scrollY > 50);
+}, { passive: true });
+
+// SCROLL REVEALS
+const allReveals = document.querySelectorAll('.reveal, .step, .stat-item');
+const io = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      const delay = parseInt(e.target.dataset.d || 0);
+      setTimeout(() => e.target.classList.add('vis'), delay);
+      io.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.1 });
+
+document.querySelectorAll('.reveal').forEach((el, i) => { el.dataset.d = (i % 3) * 100; io.observe(el); });
+document.querySelectorAll('.step').forEach((el, i)   => { el.dataset.d = i * 100; io.observe(el); });
+document.querySelectorAll('.stat-item').forEach((el, i) => { el.dataset.d = i * 100; io.observe(el); });
+
+// COUNTERS
+function runCounter(el) {
+  const target = parseInt(el.dataset.target);
+  let n = 0; const inc = target / 50;
+  const t = setInterval(() => {
+    n += inc;
+    if (n >= target) { el.textContent = target; clearInterval(t); }
+    else el.textContent = Math.floor(n);
+  }, 25);
+}
+const cio = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.querySelectorAll('.counter').forEach(runCounter);
+      cio.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.25 });
+document.querySelectorAll('.stat-item').forEach(el => cio.observe(el));
+
+// LANG TOGGLE
+const copy = {
+  en: { sub:'Resilience Intelligence System', desc:'When disaster strikes, every second matters.<br><strong>ResQ+ is the AI-powered emergency platform</strong> that guides communities through any crisis — even without internet.', btn:'🌐 ES' },
+  es: { sub:'Sistema de Inteligencia para la Resiliencia', desc:'Cuando el desastre llega, cada segundo importa.<br><strong>ResQ+ es la plataforma de emergencias con IA</strong> que guía a las comunidades en cualquier crisis — incluso sin internet.', btn:'🌐 EN' }
+};
+let lang = 'en';
+function toggleLang() {
+  lang = lang === 'en' ? 'es' : 'en';
+  document.getElementById('heroSub').textContent = copy[lang].sub;
+  document.getElementById('heroDesc').innerHTML  = copy[lang].desc;
+  document.getElementById('langBtn').textContent = copy[lang].btn;
+}
+</script>
+</body>
+</html>
